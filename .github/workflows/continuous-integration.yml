@@ -37,8 +37,8 @@ jobs:
         uses: highbyte/sonarscan-dotnet@1.0
         with:
           sonarOrganization: netension
-          sonarProjectKey: <ProjectKey>
-          sonarProjectName: <ProjectName>
+          sonarProjectKey: Netension_nhibernate
+          sonarProjectName: .Netension.NHibernate
           dotnetBuildArguments: ./src/*.sln --configuration Release
           dotnetTestArguments: ./src/*.sln --logger trx --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
           sonarBeginArguments: /d:sonar.cs.xunit.reportsPaths="**/TestResults/**/.trx" /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
