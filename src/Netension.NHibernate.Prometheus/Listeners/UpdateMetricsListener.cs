@@ -6,26 +6,39 @@ using NHibernate;
 using NHibernate.Event;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using ILoggerFactory=Microsoft.Extensions.Logging.ILoggerFactory;
+using System;
 
 namespace Netension.NHibernate.Prometheus.Listeners
 {
     internal class UpdateMetricsListener : IPreUpdateEventListener, IPostUpdateEventListener
     {
+        private const string OPERATION = "UPDATE";
         private readonly ISummaryCollection _summaryCollection;
         private readonly StopwatchCollection _stopwatchCollection;
         private readonly NHibernateMetricsOptions _options;
+        private readonly ILogger<UpdateMetricsListener> _logger;
 
-        public UpdateMetricsListener(ISummaryCollection summaryCollection, StopwatchCollection stopwatchCollection, NHibernateMetricsOptions options)
+        public UpdateMetricsListener(ISummaryCollection summaryCollection, StopwatchCollection stopwatchCollection, NHibernateMetricsOptions options, ILoggerFactory loggerFactory)
         {
             _summaryCollection = summaryCollection;
             _stopwatchCollection = stopwatchCollection;
             _options = options;
+            _logger = loggerFactory.CreateLogger<UpdateMetricsListener>();
         }
 
         public void OnPostUpdate(PostUpdateEvent @event)
         {
             var elapsedTime = _stopwatchCollection[@event.Id.ToString()];
-            _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session).Connection.Database, @event.Persister.EntityMetamodel.Type.Namespace, @event.Persister.EntityMetamodel.Type.Name, "UPDATE", string.Empty);
+            try
+            {
+                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event?.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event?.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", OPERATION);
+            }
+            catch (InvalidOperationException)
+            {
+                _logger.LogWarning("{metric} does not exist.", $"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}");
+            }
         }
 
         public async Task OnPostUpdateAsync(PostUpdateEvent @event, CancellationToken cancellationToken)

@@ -49,44 +49,52 @@ namespace Netension.NHibernate.Prometheus.Builders
         {
             _logger.LogDebug("Register {operation} statements duration metric.", "INSERT");
 
-            var listener = new InsertMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options);
+            var listener = new InsertMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options, _loggerFactory);
             _configuration.AppendListeners(ListenerType.PreInsert, new IPreInsertEventListener[] { listener });
             _configuration.AppendListeners(ListenerType.PostInsert, new IPostInsertEventListener[] { listener });
 
-            return  AddSummaryMetric($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+            _metricsCollection.RegisterSummary($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+
+            return this;
         }
 
         public NHibernateMetricsBuilder AddSelectStatementsDurationMetric()
         {
             _logger.LogDebug("Register {operation} statements duration metric.", "SELECT");
 
-            var listener = new SelectMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options);
+            var listener = new SelectMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options, _loggerFactory);
             _configuration.AppendListeners(ListenerType.PreLoad, new IPreLoadEventListener[] { listener });
             _configuration.AppendListeners(ListenerType.PostLoad, new IPostLoadEventListener[] { listener });
 
-            return AddSummaryMetric($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+            _metricsCollection.RegisterSummary($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+
+            return this;
         }
 
         public NHibernateMetricsBuilder AddUpdateStatementsDurationMetric()
         {
             _logger.LogDebug("Register {operation} statements duration metric.", "UPDATE");
 
-            var listener = new UpdateMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options);
+            var listener = new UpdateMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options, _loggerFactory);
             _configuration.AppendListeners(ListenerType.PreUpdate, new IPreUpdateEventListener[] { listener });
             _configuration.AppendListeners(ListenerType.PostUpdate, new IPostUpdateEventListener[] { listener });
 
-            return AddSummaryMetric($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+            _metricsCollection.RegisterSummary($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+
+            return this;
         }
 
         public NHibernateMetricsBuilder AddDeleteStatementsDurationMetric()
         {
             _logger.LogDebug("Register {operation} statements duration metric.", "DELETE");
 
-            var listener = new DeleteMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options);
+            var listener = new DeleteMetricsListener(_metricsCollection, new StopwatchCollection(_loggerFactory), _options, _loggerFactory);
             _configuration.AppendListeners(ListenerType.PreDelete, new IPreDeleteEventListener[] { listener });
             _configuration.AppendListeners(ListenerType.PostDelete, new IPostDeleteEventListener[] { listener });
 
-            return AddSummaryMetric($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+            _metricsCollection.RegisterSummary($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
+
+            return this;
         }
 
         public NHibernateMetricsBuilder AddBaseMetrics()

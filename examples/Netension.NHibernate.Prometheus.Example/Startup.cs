@@ -26,7 +26,7 @@ namespace Netension.NHibernate.Prometheus.Example
                             new SchemaExport(cfg).Create(false, true);
 
                             cfg.AddNHibernateMetrics(provider.GetService<ILoggerFactory>())
-                                .AddSQLStatementsDurationMetrics();
+                                .AddBaseMetrics();
                         })
                         .BuildConfiguration()
                         .BuildSessionFactory()
