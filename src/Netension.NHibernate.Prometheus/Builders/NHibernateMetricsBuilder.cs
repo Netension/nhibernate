@@ -6,8 +6,6 @@ using Netension.NHibernate.Prometheus.Listeners;
 using Netension.NHibernate.Prometheus.Options;
 using NHibernate.Cfg;
 using NHibernate.Event;
-using System.Collections.Generic;
-using System.Linq;
 using ILoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
 namespace Netension.NHibernate.Prometheus.Builders
@@ -89,76 +87,6 @@ namespace Netension.NHibernate.Prometheus.Builders
             _configuration.AppendListeners(ListenerType.PostDelete, new IPostDeleteEventListener[] { listener });
 
             return AddSummaryMetric($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}".TrimStart('_'), NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Description, NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Labels);
-        }
-
-        public NHibernateMetricsBuilder AddCounterMetric(string name, string description)
-        {
-            return AddCounterMetric(name, description, Enumerable.Empty<string>());
-        }
-
-        public NHibernateMetricsBuilder AddCounterMetric(string name, string description, IEnumerable<string> labels)
-        {
-            var fullName = $"{_options.Prefix}_{name}";
-            _logger.LogDebug("Register {name} {type} metrics.", fullName, "Counter");
-
-            _metricsCollection.RegisterCounter(fullName, description, labels);
-
-            return this;
-        }
-
-        public NHibernateMetricsBuilder AddGaugeMetric(string name, string description)
-        {
-            return AddGaugeMetric(name, description, Enumerable.Empty<string>());
-        }
-
-        public NHibernateMetricsBuilder AddGaugeMetric(string name, string description, IEnumerable<string> labels)
-        {
-            var fullName = $"{_options.Prefix}_{name}";
-            _logger.LogDebug("Register {name} {type} metrics.", fullName, "Gauge");
-
-            _metricsCollection.RegisterGauge(fullName, description, labels);
-
-            return this;
-        }
-
-        public NHibernateMetricsBuilder AddHistogramMetric(string name, string description)
-        {
-            return AddHistogramMetric(name, description, Enumerable.Empty<double>(), Enumerable.Empty<string>());
-        }
-
-        public NHibernateMetricsBuilder AddHistogramMetric(string name, string description, IEnumerable<string> labels)
-        {
-            return AddHistogramMetric($"{_options.Prefix}_{name}", description, Enumerable.Empty<double>(), labels);
-        }
-
-        public NHibernateMetricsBuilder AddHistogramMetric(string name, string description, IEnumerable<double> buckets)
-        {
-            return AddHistogramMetric($"{_options.Prefix}_{name}", description, buckets, Enumerable.Empty<string>());
-        }
-
-        public NHibernateMetricsBuilder AddHistogramMetric(string name, string description, IEnumerable<double> buckets, IEnumerable<string> labels)
-        {
-            var fullName = $"{_options.Prefix}_{name}";
-            _logger.LogDebug("Register {name} {type} metrics with.", fullName, "Histogram");
-
-            _metricsCollection.RegisterHistogram(fullName, description, buckets, labels);
-
-            return this;
-        }
-
-        public NHibernateMetricsBuilder AddSummaryMetric(string name, string description)
-        {
-            return AddSummaryMetric(name, description, Enumerable.Empty<string>());
-        }
-
-        public NHibernateMetricsBuilder AddSummaryMetric(string name, string description, IEnumerable<string> labels)
-        {
-            var fullName = $"{_options.Prefix}_{name}";
-            _logger.LogDebug("Register {name} {type} metrics with.", fullName, "Counter");
-
-            _metricsCollection.RegisterSummary(fullName, description, labels);
-
-            return this;
         }
 
         public NHibernateMetricsBuilder AddBaseMetrics()

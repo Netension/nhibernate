@@ -14,8 +14,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Netension.Monitoring.Core" Version="1.0.0-alpha.9" />
-    <PackageReference Include="Netension.Monitoring.Prometheus" Version="1.0.0-alpha.9" />
+    <PackageReference Include="Netension.Monitoring.Core" Version="1.0.0-alpha.12" />
+    <PackageReference Include="Netension.Monitoring.Prometheus" Version="1.0.0-alpha.12" />
     <PackageReference Include="NHibernate" Version="5.2.0" />
   </ItemGroup>
 
