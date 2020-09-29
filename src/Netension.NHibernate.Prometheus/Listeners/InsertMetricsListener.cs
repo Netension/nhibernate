@@ -34,7 +34,7 @@ namespace Netension.NHibernate.Prometheus.Listeners
 
             try
             {
-                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", STATEMENT, string.Empty);
+                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", STATEMENT);
             }
             catch (InvalidOperationException)
             {

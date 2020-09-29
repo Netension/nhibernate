@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Example.Entities;
 using NHibernate.Tool.hbm2ddl;
 using Prometheus;
@@ -16,6 +17,13 @@ namespace Netension.NHibernate.Prometheus.Example
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLogging();
+
+            services.AddPrometheusMetrics((registry, context) =>
+            {
+                
+            });
+
             services.AddSingleton(provider =>
             {
                 return Fluently.Configure()
@@ -25,7 +33,7 @@ namespace Netension.NHibernate.Prometheus.Example
                         {
                             new SchemaExport(cfg).Create(false, true);
 
-                            cfg.AddNHibernateMetrics(provider.GetService<ILoggerFactory>())
+                            cfg.AddNHibernateMetrics(provider.GetService<ILoggerFactory>(), provider.GetService<IPrometheusMetricsRegistry>(), provider.GetService<ISummaryCollection>())
                                 .AddBaseMetrics();
                         })
                         .BuildConfiguration()

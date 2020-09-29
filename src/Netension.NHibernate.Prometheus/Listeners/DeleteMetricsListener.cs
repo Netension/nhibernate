@@ -33,7 +33,7 @@ namespace Netension.NHibernate.Prometheus.Listeners
             var elapsedTime = _stopwatchCollection[@event.Id.ToString()];
             try
             {
-                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event?.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event?.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", OPERATION, string.Empty);
+                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event?.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event?.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", OPERATION);
             }
             catch (InvalidOperationException)
             {
