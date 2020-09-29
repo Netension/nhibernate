@@ -1,4 +1,4 @@
-![nuget-template](https://github.com/Netension/nuget-template/blob/develop/banner.png)
+![nuget-template](https://github.com/Netension/nhibernate/blob/develop/banner.png)
 __Netension.NHibernate__ packages provide add-ons for [NHibernate](https://nhibernate.info/) ORM framework.
 
 ![Publish](https://github.com/Netension/nhibernate/workflows/Publish/badge.svg)<br/>
