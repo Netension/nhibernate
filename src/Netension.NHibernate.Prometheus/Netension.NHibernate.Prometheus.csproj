@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>Bence, Mihucza</Authors>
+    <PackageIcon>logo.png</PackageIcon>
+    <RepositoryUrl>https://github.com/Netension/monitoring</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>monitoring, prometheus, nhibernate</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitVersionTask" Version="5.3.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Netension.Monitoring.Core" Version="1.0.0-alpha.13" />
+    <PackageReference Include="Netension.Monitoring.Prometheus" Version="1.0.0-alpha.13" />
+    <PackageReference Include="NHibernate" Version="5.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\logo.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>
