@@ -36,7 +36,7 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
         }
 
         [Fact(DisplayName = "Delete metrics - Start stopwatch")]
-        public async Task DeleteMetrics_PreLoadAsync_StartStopwatch()
+        public async Task DeleteMetrics_PreDeleteAsync_StartStopwatch()
         {
             // Arrange
             var sut = CreateSUT();
@@ -50,7 +50,7 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
         }
 
         [Fact(DisplayName = "Select metrics - Observe")]
-        public async Task SelectMetrics_PostLoad_ObserveMetric()
+        public async Task SelectMetrics_PostDeleteAsync_ObserveMetric()
         {
             // Arrange
             var sut = CreateSUT();
@@ -66,7 +66,7 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
         }
 
         [Fact(DisplayName = "Select metrics - Observe not exists metric")]
-        public async Task SelectMetrics_PostLoad_ObserveNotExistsMetric()
+        public async Task SelectMetrics_PostDeleteAsync_ObserveNotExistsMetric()
         {
             // Arrange
             var sut = CreateSUT();

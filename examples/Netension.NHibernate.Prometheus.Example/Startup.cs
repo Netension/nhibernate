@@ -19,9 +19,11 @@ namespace Netension.NHibernate.Prometheus.Example
         {
             services.AddLogging();
 
-            services.AddPrometheusMetrics((registry, context) =>
+            services.AddPrometheusMetrics((registry, provider) =>
             {
-                
+                registry.RegistrateNHibernateMetrics()
+                    .RegistrateStatementDuration();
+                    
             });
 
             services.AddSingleton(provider =>
@@ -33,8 +35,10 @@ namespace Netension.NHibernate.Prometheus.Example
                         {
                             new SchemaExport(cfg).Create(false, true);
 
-                            cfg.AddNHibernateMetrics(provider.GetService<ILoggerFactory>(), provider.GetService<IPrometheusMetricsRegistry>(), provider.GetService<ISummaryCollection>())
-                                .AddBaseMetrics();
+                            cfg.AddInsertMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddSelectMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddUpdateMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddDeleteMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>());
                         })
                         .BuildConfiguration()
                         .BuildSessionFactory()

@@ -15,16 +15,15 @@ namespace Netension.NHibernate.Prometheus.Listeners
     internal class InsertMetricsListener : IPreInsertEventListener, IPostInsertEventListener
     {
         private const string STATEMENT = "INSERT";
-        private readonly ISummaryCollection _summaryCollection;
+
+        private readonly ISummaryManager _summaryManager;
         private readonly StopwatchCollection _stopwatchCollection;
-        private readonly NHibernateMetricsOptions _options;
         private readonly ILogger<InsertMetricsListener> _logger;
 
-        public InsertMetricsListener(ISummaryCollection summaryCollection, StopwatchCollection stopwatchCollection, NHibernateMetricsOptions options, ILoggerFactory loggerFactory)
+        public InsertMetricsListener(ISummaryManager summaryManager, StopwatchCollection stopwatchCollection, ILoggerFactory loggerFactory)
         {
-            _summaryCollection = summaryCollection;
+            _summaryManager = summaryManager;
             _stopwatchCollection = stopwatchCollection;
-            _options = options;
             _logger = loggerFactory.CreateLogger<InsertMetricsListener>();
         }
 
@@ -34,11 +33,11 @@ namespace Netension.NHibernate.Prometheus.Listeners
 
             try
             {
-                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", STATEMENT);
+                _summaryManager.Observe(NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name, elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", STATEMENT);
             }
             catch (InvalidOperationException)
             {
-                _logger.LogError("{metric} does not exist.", $"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}");
+                _logger.LogError("{metric} does not exist.", NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name);
             }
         }
 

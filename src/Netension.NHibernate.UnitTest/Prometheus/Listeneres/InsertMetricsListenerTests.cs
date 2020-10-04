@@ -36,7 +36,7 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
         }
 
         [Fact(DisplayName = "Insert metrics - Start stopwatch")]
-        public async Task InsertMetrics_PreLoadAsync_StartStopwatch()
+        public async Task InsertMetrics_PreInsertAsync_StartStopwatch()
         {
             // Arrange
             var sut = CreateSUT();
@@ -50,7 +50,7 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
         }
 
         [Fact(DisplayName = "Insert metrics - Observe")]
-        public async Task InsertMetrics_PostLoad_ObserveMetric()
+        public async Task InsertMetrics_PostInsertAsync_ObserveMetric()
         {
             // Arrange
             var sut = CreateSUT();
@@ -66,7 +66,7 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
         }
 
         [Fact(DisplayName = "Insert metrics - Observe not exists metric")]
-        public async Task InsertMetrics_PostLoad_ObserveNotExistsMetric()
+        public async Task InsertMetrics_PostInstertAsync_ObserveNotExistsMetric()
         {
             // Arrange
             var sut = CreateSUT();
