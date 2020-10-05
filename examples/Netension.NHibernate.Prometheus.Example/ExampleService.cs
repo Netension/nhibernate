@@ -54,7 +54,7 @@ namespace Netension.NHibernate.Prometheus.Example
                         entity.Value = namesGenerator.GetRandomName();
                     }
 
-                    await transaction.RollbackAsync(cancellationToken);
+                    await transaction.CommitAsync(cancellationToken);
                 }
                 catch
                 {
@@ -101,7 +101,7 @@ namespace Netension.NHibernate.Prometheus.Example
                         await _session.DeleteAsync(entity);
                     }
 
-                    await transaction.CommitAsync(cancellationToken);
+                    await transaction.RollbackAsync(cancellationToken);
                 }
                 catch
                 {

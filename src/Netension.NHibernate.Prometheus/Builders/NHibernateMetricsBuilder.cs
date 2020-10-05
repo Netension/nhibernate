@@ -18,5 +18,19 @@ namespace Netension.NHibernate.Prometheus.Builders
 
             return this;
         }
+
+        public NHibernateMetricsBuilder RegistrateTotalTransactionsCount()
+        {
+            _prometheusMetricsRegistry.RegistrateCounter(NHibernateMetricsEnumeration.TotalTransactionsCount.Name, NHibernateMetricsEnumeration.TotalTransactionsCount.Description, NHibernateMetricsEnumeration.TotalTransactionsCount.Labels);
+
+            return this;
+        }
+
+        public NHibernateMetricsBuilder RegistrateRecordCount()
+        {
+            _prometheusMetricsRegistry.RegistrateGauge(NHibernateMetricsEnumeration.RecordCount.Name, NHibernateMetricsEnumeration.RecordCount.Description, NHibernateMetricsEnumeration.RecordCount.Labels);
+
+            return this;
+        }
     }
 }
