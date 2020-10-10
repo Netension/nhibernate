@@ -21,7 +21,7 @@ namespace Netension.NHibernate.Prometheus.Interceptors
 
             if (tx == null) return;
 
-            string operation = "UNKOWN";
+            string operation = "UNKNOWN";
             if (tx.WasCommitted) operation = "COMMIT";
             else if (tx.WasRolledBack) operation = "ROLLBACK";
 
