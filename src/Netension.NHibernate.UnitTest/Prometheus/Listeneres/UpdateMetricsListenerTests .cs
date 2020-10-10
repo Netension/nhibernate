@@ -4,7 +4,7 @@ using Netension.Monitoring.Core.Diagnostics;
 using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Enumerations;
 using Netension.NHibernate.Prometheus.Listeners;
-using Netension.NHibernate.Prometheus.Options;
+using Netension.NHibernate.Prometheus.Services;
 using NHibernate.Event;
 using System;
 using System.Threading.Tasks;
@@ -15,8 +15,8 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
 {
     public class UpdateMetricsListenerTests
     {
-        private readonly string _prefix = "update_metrics_test";
-        private Mock<ISummaryCollection> _summaryCollectionMock;
+        private readonly string _prefix = "metrics_test";
+        private Mock<ISummaryManager> _summaryManagerMock;
         private StopwatchCollection _stopwatchCollection;
         private readonly ITestOutputHelper _outputHelper;
 
@@ -25,75 +25,62 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Listeneres
             _outputHelper = outputHelper;
         }
 
-        private SelectMetricsListener CreateSUT()
+        private UpdateMetricsListener CreateSUT()
         {
             var loggerFactory = new LoggerFactory().AddXUnit(_outputHelper);
 
-            _summaryCollectionMock = new Mock<ISummaryCollection>();
+            _summaryManagerMock = new Mock<ISummaryManager>();
             _stopwatchCollection = new StopwatchCollection(loggerFactory);
 
-            return new SelectMetricsListener(_summaryCollectionMock.Object, _stopwatchCollection, new NHibernateMetricsOptions { Prefix = _prefix }, loggerFactory);
+            NamingService.SetPrefix(_prefix);
+
+            return new UpdateMetricsListener(_summaryManagerMock.Object, _stopwatchCollection, loggerFactory);
         }
 
-        [Fact(DisplayName = "Select metrics - Start stopwatch")]
-        public async Task SelectMetrics_PreLoadAsync_StartStopwatch()
+        [Fact(DisplayName = "Update metrics - Start stopwatch")]
+        public async Task UpdateMetrics_PreUpdateAsync_StartStopwatch()
         {
             // Arrange
             var sut = CreateSUT();
-            var @event = new PreLoadEvent(new Mock<IEventSource>().Object)
-            {
-                Id = Guid.NewGuid()
-            };
+            var @event = new PreUpdateEvent(null, Guid.NewGuid(), null, null, null, null);
 
             // Act
-            await sut.OnPreLoadAsync(@event, default);
+            await sut.OnPreUpdateAsync(@event, default);
 
             // Assert
             Assert.NotEqual(TimeSpan.Zero, _stopwatchCollection[@event.Id.ToString()]);
         }
 
-        [Fact(DisplayName = "Select metrics - Observe")]
-        public async Task SelectMetrics_PostLoad_ObserveMetric()
+        [Fact(DisplayName = "Update metrics - Observe")]
+        public async Task UpdateMetrics_PostUpdate_ObserveMetric()
         {
             // Arrange
             var sut = CreateSUT();
             var id = Guid.NewGuid();
 
-            await sut.OnPreLoadAsync(new PreLoadEvent(new Mock<IEventSource>().Object)
-            {
-                Id = id
-            }, default);
+            await sut.OnPreUpdateAsync(new PreUpdateEvent(null, id, null, null, null, null), default);
 
             // Act
-            sut.OnPostLoad(new PostLoadEvent(new Mock<IEventSource>().Object)
-            {
-                Id = id
-            });
+            await sut.OnPostUpdateAsync(new PostUpdateEvent(null, Guid.NewGuid(), null, null, null, null), default);
 
             // Assert
-            _summaryCollectionMock.Verify(sc => sc.Observe(It.Is<string>(n => n.Equals($"{_prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}")), It.IsAny<double>(), It.IsAny<string[]>()), Times.Once);
+            _summaryManagerMock.Verify(sc => sc.Observe(It.Is<string>(n => n.Equals($"{_prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}")), It.IsAny<double>(), It.IsAny<string[]>()), Times.Once);
         }
 
-        [Fact(DisplayName = "Select metrics - Observe not exists metric")]
-        public async Task SelectMetrics_PostLoad_ObserveNotExistsMetric()
+        [Fact(DisplayName = "Update metrics - Observe not exists metric")]
+        public async Task UpdateMetrics_PosUpdate_ObserveNotExistsMetric()
         {
             // Arrange
             var sut = CreateSUT();
             var id = Guid.NewGuid();
 
-            _summaryCollectionMock.Setup(sc => sc.Observe(It.IsAny<string>(), It.IsAny<double>(), It.IsAny<string[]>()))
+            _summaryManagerMock.Setup(sc => sc.Observe(It.IsAny<string>(), It.IsAny<double>(), It.IsAny<string[]>()))
                 .Throws<InvalidOperationException>();
 
-            await sut.OnPreLoadAsync(new PreLoadEvent(new Mock<IEventSource>().Object)
-            {
-                Id = id
-            }, default);
+            await sut.OnPreUpdateAsync(new PreUpdateEvent(null, id, null, null, null, null), default);
 
             // Act
-            sut.OnPostLoad(new PostLoadEvent(new Mock<IEventSource>().Object)
-            {
-                Id = id
-            });
+            await sut.OnPostUpdateAsync(new PostUpdateEvent(null, Guid.NewGuid(), null, null, null, null), default);
 
             // Assert - Not thrown exception
             Assert.True(true);

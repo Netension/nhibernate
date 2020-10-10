@@ -2,7 +2,7 @@
 using Netension.Monitoring.Core.Diagnostics;
 using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Enumerations;
-using Netension.NHibernate.Prometheus.Options;
+using Netension.NHibernate.Prometheus.Services;
 using NHibernate;
 using NHibernate.Event;
 using System;
@@ -11,22 +11,21 @@ using System.Threading;
 using System.Threading.Tasks;
 using ILoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
-[assembly:InternalsVisibleTo("Netension.NHibernate.UnitTest")]
+[assembly: InternalsVisibleTo("Netension.NHibernate.UnitTest")]
 namespace Netension.NHibernate.Prometheus.Listeners
 {
     internal class SelectMetricsListener : IPreLoadEventListener, IPostLoadEventListener
     {
         private const string OPERATION = "SELECT";
-        private readonly ISummaryCollection _summaryCollection;
+
+        private readonly ISummaryManager _summaryManager;
         private readonly StopwatchCollection _stopwatchCollection;
-        private readonly NHibernateMetricsOptions _options;
         private readonly ILogger<SelectMetricsListener> _logger;
 
-        public SelectMetricsListener(ISummaryCollection summaryCollection, StopwatchCollection stopwatchCollection, NHibernateMetricsOptions options, ILoggerFactory loggerFactory)
+        public SelectMetricsListener(ISummaryManager summaryManager, StopwatchCollection stopwatchCollection, ILoggerFactory loggerFactory)
         {
-            _summaryCollection = summaryCollection;
+            _summaryManager = summaryManager;
             _stopwatchCollection = stopwatchCollection;
-            _options = options;
             _logger = loggerFactory.CreateLogger<SelectMetricsListener>();
         }
 
@@ -35,11 +34,11 @@ namespace Netension.NHibernate.Prometheus.Listeners
             var elapsedTime = _stopwatchCollection[@event.Id.ToString()];
             try
             {
-                _summaryCollection.Observe($"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}", elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOWN", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOWN", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOWN", OPERATION);
+                _summaryManager.Observe(NamingService.GetFullName(NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name), elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOWN", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOWN", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOWN", OPERATION);
             }
             catch (InvalidOperationException)
             {
-                _logger.LogWarning("{metric} does not exist.", $"{_options.Prefix}_{NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name}");
+                _logger.LogWarning("{metric} does not exist.", NamingService.GetFullName(NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name));
             }
         }
 

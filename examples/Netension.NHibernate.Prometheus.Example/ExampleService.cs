@@ -4,7 +4,6 @@ using Netension.NHibernate.Prometheus.Example.Entities;
 using NHibernate;
 using NHibernate.Linq;
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -102,7 +101,7 @@ namespace Netension.NHibernate.Prometheus.Example
                         await _session.DeleteAsync(entity);
                     }
 
-                    await transaction.CommitAsync(cancellationToken);
+                    await transaction.RollbackAsync(cancellationToken);
                 }
                 catch
                 {

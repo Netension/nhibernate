@@ -10,12 +10,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentNHibernate" Version="2.1.2" />
     <PackageReference Include="GitVersionTask" Version="5.3.7">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Netension.Monitoring.Core" Version="1.0.0-alpha.13" />
-    <PackageReference Include="Netension.Monitoring.Prometheus" Version="1.0.0-alpha.13" />
+    <PackageReference Include="Netension.Monitoring.Core" Version="1.1.0-alpha.2" />
+    <PackageReference Include="Netension.Monitoring.Prometheus" Version="1.1.0-alpha.2" />
     <PackageReference Include="NHibernate" Version="5.2.0" />
   </ItemGroup>
 

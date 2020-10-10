@@ -3,11 +3,11 @@
 namespace Netension.NHibernate.Prometheus.Options
 {
     [ExcludeFromCodeCoverage]
-    public class NHibernateMetricsOptions
+    public class NHibernateRecordCountMetricOptions
     {
         /// <summary>
-        /// Prefix of the NHibernate metrics. Default value is nhibernate.
+        /// Interval of record count determination in seconds.
         /// </summary>
-        public string Prefix { get; set; }
+        public int Interval { get; set; }
     }
 }

@@ -19,22 +19,29 @@ namespace Netension.NHibernate.Prometheus.Example
         {
             services.AddLogging();
 
-            services.AddPrometheusMetrics((registry, context) =>
+            services.AddPrometheusMetrics((registry, provider) =>
             {
-                
+                registry.RegistrateNHibernateMetrics()
+                    .RegistrateStatementDuration()
+                    .RegistrateTotalTransactionsCount()
+                    .RegistrateRecordCount();
             });
+            services.AddRecordCounter<ExampleEntity>();
 
             services.AddSingleton(provider =>
             {
                 return Fluently.Configure()
                         .Database(SQLiteConfiguration.Standard.ConnectionString(@"Data Source=.\Database\example.db;Version=3;"))
                                         .Mappings(mapping => mapping.FluentMappings.AddFromAssemblyOf<ExampleEntity>())
-                        .ExposeConfiguration(cfg =>
+                        .ExposeConfiguration(configuration =>
                         {
-                            new SchemaExport(cfg).Create(false, true);
+                            new SchemaExport(configuration).Create(false, true);
 
-                            cfg.AddNHibernateMetrics(provider.GetService<ILoggerFactory>(), provider.GetService<IPrometheusMetricsRegistry>(), provider.GetService<ISummaryCollection>())
-                                .AddBaseMetrics();
+                            configuration.AddInsertMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddSelectMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddUpdateMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddDeleteMetricListener(provider.GetService<ISummaryManager>(), provider.GetService<ILoggerFactory>())
+                                .AddTransactionCountListener(provider.GetService<ICounterManager>(), provider.GetService<ILoggerFactory>());
                         })
                         .BuildConfiguration()
                         .BuildSessionFactory()
