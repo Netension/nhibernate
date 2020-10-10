@@ -1,6 +1,6 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Continuous Deployment
+name: Publish
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the develop branch
@@ -22,6 +22,16 @@ jobs:
       
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.7.0
+        
+      - name: Run analysis and tests
+        uses: highbyte/sonarscan-dotnet@1.0
+        with:
+          sonarOrganization: netension
+          sonarProjectKey: Netension_nhibernate
+          sonarProjectName: .Netension.NHibernate
+          dotnetBuildArguments: ./src/*.sln --configuration Release
+          dotnetTestArguments: ./src/*.sln --logger trx --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+          sonarBeginArguments: /d:sonar.cs.xunit.reportsPaths="**/TestResults/**/.trx" /d:sonar.cs.opencover.reportsPaths="**/TestResults/**/coverage.opencover.xml" -d:sonar.cs.vstest.reportsPaths="**/TestResults/*.trx"
         
       - name: Create NuGet packages
         run: dotnet pack ./src/*.sln --configuration Release --output ./artifacts/ --include-source --include-symbols
