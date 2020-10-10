@@ -5,10 +5,11 @@ using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Builders;
 using Netension.NHibernate.Prometheus.Interceptors;
 using Netension.NHibernate.Prometheus.Listeners;
+using Netension.NHibernate.Prometheus.Options;
 using Netension.NHibernate.Prometheus.Services;
 using NHibernate.Cfg;
 using NHibernate.Event;
-using NHibernate.Hql.Ast.ANTLR.Tree;
+using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Netension.NHibernate.Prometheus
@@ -56,10 +57,19 @@ namespace Netension.NHibernate.Prometheus
             return configuration;
         }
 
+        public static IServiceCollection AddRecordCounter<TEntity>(this IServiceCollection services, Action<NHibernateRecordCountMetricOptions> configure)
+            where TEntity : class
+        {
+            services.AddOptions<NHibernateRecordCountMetricOptions>()
+                .Configure(configure);
+
+            return services.AddHostedService<RecordCounterService<TEntity>>();
+        }
+
         public static IServiceCollection AddRecordCounter<TEntity>(this IServiceCollection services)
             where TEntity : class
         {
-            return services.AddHostedService<RecordCounterService<TEntity>>();
+            return services.AddRecordCounter<TEntity>((options) => options.Interval = 5);
         }
 
         public static Configuration AddTransactionCountListener(this Configuration configuration, ICounterManager counterManager, ILoggerFactory loggerFactory)
@@ -69,6 +79,16 @@ namespace Netension.NHibernate.Prometheus
 
         public static NHibernateMetricsBuilder RegistrateNHibernateMetrics(this IPrometheusMetricsRegistry registry)
         {
+            return registry.RegistrateNHibernateMetrics((options) => options.Prefix = "nhibernate");
+        }
+
+        public static NHibernateMetricsBuilder RegistrateNHibernateMetrics(this IPrometheusMetricsRegistry registry, Action<NHibernateMetricsOptions> configure)
+        {
+            var options = new NHibernateMetricsOptions();
+            configure(options);
+
+            NamingService.SetPrefix(options.Prefix);
+
             return new NHibernateMetricsBuilder(registry);
         }
     }

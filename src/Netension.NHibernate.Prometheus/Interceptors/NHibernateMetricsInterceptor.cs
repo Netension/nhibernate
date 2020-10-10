@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Enumerations;
+using Netension.NHibernate.Prometheus.Services;
 using NHibernate;
 using ILoggerFactory = Microsoft.Extensions.Logging.ILoggerFactory;
 
@@ -23,8 +24,7 @@ namespace Netension.NHibernate.Prometheus.Interceptors
 
             if (tx == null) return;
 
-            _logger.LogDebug("Increase {name} metric.", NHibernateMetricsEnumeration.TotalTransactionsCount.Name);
-            _counterManager.Increase(NHibernateMetricsEnumeration.TotalTransactionsCount.Name, tx.WasCommitted ? "COMMIT" : tx.WasRolledBack ? "ROLLBACK" : "UNKNOWN");
+            _counterManager.Increase(NamingService.GetFullName(NHibernateMetricsEnumeration.TotalTransactionsCount.Name), tx.WasCommitted ? "COMMIT" : tx.WasRolledBack ? "ROLLBACK" : "UNKNOWN");
         }
     }
 }

@@ -2,7 +2,7 @@
 using Netension.Monitoring.Core.Diagnostics;
 using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Enumerations;
-using Netension.NHibernate.Prometheus.Options;
+using Netension.NHibernate.Prometheus.Services;
 using NHibernate;
 using NHibernate.Event;
 using System;
@@ -33,11 +33,11 @@ namespace Netension.NHibernate.Prometheus.Listeners
 
             try
             {
-                _summaryManager.Observe(NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name, elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", STATEMENT);
+                _summaryManager.Observe(NamingService.GetFullName(NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name), elapsedTime.TotalMilliseconds, ((ISession)@event.Session)?.Connection?.Database ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Namespace ?? "UNKNOW", @event.Persister?.EntityMetamodel?.Type?.Name ?? "UNKNOW", STATEMENT);
             }
             catch (InvalidOperationException)
             {
-                _logger.LogError("{metric} does not exist.", NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name);
+                _logger.LogError("{metric} does not exist.", NamingService.GetFullName(NHibernateMetricsEnumeration.SqlStatementExecuteDuration.Name));
             }
         }
 
