@@ -66,6 +66,23 @@ namespace Netension.NHibernate.UnitTest.Prometheus.Interceptors
         }
 
         [Fact]
+        public void NHibernateMetricsInterceptor_AfterTransactionCompletion_Unkown()
+        {
+            // Arrange
+            var sut = CreateSUT();
+
+            var transactionMock = new Mock<ITransaction>();
+            transactionMock.Setup(t => t.WasRolledBack).Returns(false);
+            transactionMock.Setup(t => t.WasCommitted).Returns(false);
+
+            // Act
+            sut.AfterTransactionCompletion(transactionMock.Object);
+
+            // Assert
+            _counterManagerMock.Verify(cmm => cmm.Increase(It.Is<string>(n => n.Equals($"{_prefix}_{NHibernateMetricsEnumeration.TotalTransactionsCount.Name}")), It.Is<string[]>(l => l[0].Equals("UNKNOWN"))), Times.Once);
+        }
+
+        [Fact]
         public void NHibernateMetricsInterceptor_AfterTransactionCompletion_TransactionNull()
         {
             // Arrange

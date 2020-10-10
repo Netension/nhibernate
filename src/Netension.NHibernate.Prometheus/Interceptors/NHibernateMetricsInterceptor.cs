@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Netension.Monitoring.Prometheus;
+﻿using Netension.Monitoring.Prometheus;
 using Netension.NHibernate.Prometheus.Enumerations;
 using Netension.NHibernate.Prometheus.Services;
 using NHibernate;
@@ -9,12 +8,10 @@ namespace Netension.NHibernate.Prometheus.Interceptors
 {
     public class NHibernateMetricsInterceptor : EmptyInterceptor
     {
-        private readonly ILogger<NHibernateMetricsInterceptor> _logger;
         private readonly ICounterManager _counterManager;
 
         public NHibernateMetricsInterceptor(ILoggerFactory loggerFactory, ICounterManager counterManager)
         {
-            _logger = loggerFactory.CreateLogger<NHibernateMetricsInterceptor>();
             _counterManager = counterManager;
         }
 
@@ -24,7 +21,11 @@ namespace Netension.NHibernate.Prometheus.Interceptors
 
             if (tx == null) return;
 
-            _counterManager.Increase(NamingService.GetFullName(NHibernateMetricsEnumeration.TotalTransactionsCount.Name), tx.WasCommitted ? "COMMIT" : tx.WasRolledBack ? "ROLLBACK" : "UNKNOWN");
+            string operation = "UNKOWN";
+            if (tx.WasCommitted) operation = "COMMIT";
+            else if (tx.WasRolledBack) operation = "ROLLBACK";
+
+            _counterManager.Increase(NamingService.GetFullName(NHibernateMetricsEnumeration.TotalTransactionsCount.Name), operation);
         }
     }
 }
