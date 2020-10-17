@@ -7,8 +7,6 @@ name: Continuous Integration
 on:
   pull_request:
     branches: [develop, master]
-  push:
-    branches: develop
 
 env:
   SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
